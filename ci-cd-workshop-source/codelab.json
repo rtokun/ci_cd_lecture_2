@@ -1,0 +1,17 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2020-11-27T16:22:09+02:00",
+  "id": "ci-cd-workshop-source",
+  "duration": 16,
+  "title": "Android Academy CI/CD Workshop Dec 2020",
+  "summary": "",
+  "source": "/Users/artyom/Programming/codelabs/CI_CD_Workshop_new/main.md",
+  "theme": "",
+  "status": null,
+  "category": null,
+  "tags": [],
+  "url": "ci-cd-workshop-source"
+}

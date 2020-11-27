@@ -1,0 +1,114 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Android Academy CI/CD Workshop Dec 2020</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  id="ci-cd-workshop-source"
+                  title="Android Academy CI/CD Workshop Dec 2020"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Step 1 - Repository Setup" duration="5">
+        <h2 is-upgraded>If you&#39;ve attended Android Academy&#39;s previous workshops</h2>
+<ul>
+<li>Make sure your starter project is up to date and uploaded to your Github repository.</li>
+</ul>
+<h2 is-upgraded>If you just came here - welcome! Please fork our starter project into your Github Account</h2>
+<ol type="1">
+<li>In the following link: <a href="https://github.com/AcademyTLV/StartFromScratch" target="_blank">https://github.com/AcademyTLV/StartFromScratch</a>.</li>
+<li>Go to right top corner and click &#34;Fork&#34;.</li>
+<li>Then go to your forked repository and pull the code to your local machine.</li>
+<li>Open downloaded file in Android Studio, build and compile.</li>
+</ol>
+<h3 is-upgraded>Congrats! We can start with CI related files now :)</h3>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 2 - Run your first build" duration="5">
+        <h2 is-upgraded>Add workflow file</h2>
+<p>1. Go to project and a directory <code>.github</code> in the root.<br>2. Inside it, create another directory called <code>workflows</code> (This is where all the GitHub Actions configuration files go).<br>3. Create first configuration file <code>workflow_1.yaml</code>.<br>4. Open it and add next code:</p>
+<pre><code language="language-yaml" class="language-yaml">name: &#34;CI Workflow&#34;
+on: [push]
+	
+jobs: 
+  build: 
+    name: &#34;Build project&#34;
+    runs-on: ubuntu-latest
+    steps: 
+      - name: &#34;Checkout current repository in ubuntu&#39;s file system&#34;
+        uses: actions/checkout@v1
+      - name: &#34;Setup JDK 1.8&#34;
+        uses: actions/setup-java@v1
+        with: 
+          java-version: 1.8
+      - name: &#34;Builds debug build&#34;
+        run: ./gradlew assembleDebug
+</code></pre>
+<p><br>5. Commit ang push the changes to origin:</p>
+<pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Initial build action add&#34;
+git push origin master
+</code></pre>
+<p><br>6. You should see a result: <img alt="image_caption" src="img/d68117fa9036958d.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 3 - Add Unit Tests" duration="3">
+        <h2 is-upgraded>Run unit tests locally</h2>
+<p>1. Go to your test folder.<br>2. Locate <code>ExampleUnitTest.kt</code> or other test files and validate the test passes locally by running in command line<br></p>
+<pre><code language="language-bash" class="language-bash">./gradlew testDebugUnitTest
+</code></pre>
+<h2 is-upgraded>Modify <code>.yaml</code> file</h2>
+<p>1. Add to the bottom of your workfow file:<br></p>
+<pre><code language="language-yaml" class="language-yaml">- name: Unit tests
+  run: ./gradlew testDebugUnitTest
+</code></pre>
+<p>2. Commit ang push the changes:</p>
+<pre><code language="language-bash" class="language-bash">git commit -m &#34;Add unit test to the workflow&#34;
+git push origin master
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 4 - Convert to release build" duration="3">
+        <h2 is-upgraded>Modify <code>.yaml</code> file</h2>
+<p>1. Change from <code>./gradlew assembleDebug</code> to <code>./gradlew assembleRelease</code><br>2. Change from <code>./gradlew testDebugUnitTest</code> to <code>./gradlew testReleaseUnitTest</code><br>3. Commit ang push the changes:</p>
+<pre><code language="language-bash" class="language-bash">git commit -m &#34;Convert build to release&#34;
+git push origin master
+</code></pre>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
