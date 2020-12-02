@@ -112,9 +112,10 @@ git push origin master
 ```
 <br/>
 
-<!-- ------------------------ -->
+##Step 5 - Signing your release
 
-<!--## Step 3 - Configure environment variables
+
+##Step 6 - Configure environment variables
 Duration: 0:03:00
 
 An environment variable is a dynamic-named value that can affect the way running processes will behave on a computer.
