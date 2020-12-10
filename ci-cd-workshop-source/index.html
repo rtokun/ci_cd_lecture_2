@@ -79,7 +79,7 @@ git push origin master
 <p>1. Go to your test folder.<br>2. Locate <code>ExampleUnitTest.kt</code> or other test files and validate the test passes locally by running in command line<br></p>
 <pre><code language="language-bash" class="language-bash">./gradlew testDebugUnitTest
 </code></pre>
-<h2 is-upgraded>Modify <code>.yaml</code> file</h2>
+<h2 is-upgraded>Modify <code>.yaml</code> file:</h2>
 <p>1. Add to the bottom of your workfow file:<br></p>
 <pre><code language="language-yaml" class="language-yaml">- name: Unit tests
   run: ./gradlew testDebugUnitTest
@@ -98,6 +98,68 @@ git push origin master
 <pre><code language="language-bash" class="language-bash">git commit -m &#34;Convert build to release&#34;
 git push origin master
 </code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 5 - Signing your release" duration="0">
+        
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 6 - Configure environment variables" duration="3">
+        <p>An environment variable is a dynamic-named value that can affect the way running processes will behave on a computer.</p>
+<h2 is-upgraded>When running on your local machine there are few ways to use it:</h2>
+<ul>
+<li>run in terminal:</li>
+</ul>
+<pre><code language="language-bash" class="language-bash">export MY_ENVIROMENT_VARIABLE = some_value
+</code></pre>
+<ul>
+<li>add to your <code>bashrc</code> file - your bash config file:</li>
+</ul>
+<pre><code language="language-bash" class="language-bash">export MY_ENVIROMENT_VARIABLE = some_value 
+</code></pre>
+<h2 is-upgraded>But when we run a process the Github Actions&#39; remote machine we define the environment variable in another way:</h2>
+<p>1. Go to the github project repository.<br>2. Follow the Settings tab.<br>3. In the Settings tab go to Secrets on the left menu (If you can&#39;t see it - maybe you don&#39;t have permissions for this project).<br></p>
+<p class="image-container"><img alt="image_caption" src="img/776949dee3019677.png"></p>
+<p>4.  Now click on the &#34;New Repository Secret&#34; on the right top.<br>5.  Add a new secret!<br><img alt="image_caption" src="img/812bf13177f4f49.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 7 - Add keystore.release to Github secrets storage" duration="3">
+        <h2 is-upgraded>7.1 - Create release.keystore file if not exist yet (skip to step 7.2 if already have one)</h2>
+<ol type="1">
+<li>Go to <code>Android Studio -> Build -> Generate Signed Bundle or APK</code>.</li>
+<li>Choose APK and click <code>Next</code>.</li>
+<li>In the <code>Keystore Path</code> click <code>Create new...</code>.</li>
+<li>Follow wizard instructions, fill relevant data and remember created keystore location.</li>
+</ol>
+<h2 is-upgraded>7.2 - Generate base64 string from release.keystore file</h2>
+<ol type="1">
+<li>Open terminal in the folder where the keystore located at.</li>
+<li>Run <code>base64 -w 0 release.keystore | xclip -selection clipboard</code>(It will also copy the created string to your clipboard).</li>
+</ol>
+<h2 is-upgraded>7.3 - Add keystore string to Github secrets</h2>
+<ol type="1">
+<li>Go to your <code>Github repository -> Settings -> Secrets</code>.</li>
+<li>Create new secret and give it name <code>SIGNING_KEY</code>.</li>
+<li>Paste previously copied string as secret value and save the secret.</li>
+</ol>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Step 8 - Create signed release APK" duration="3">
+        <h2 is-upgraded>Modify <code>.yaml</code> file:</h2>
+<p>1. Add these lines after <code>Grant rights</code> step:<br></p>
+<pre><code language="language-yaml" class="language-yaml">- name: Restore release keystore
+  run: echo &#34;$&#123;&#123; secrets.SIGNING_KEY }}&#34; | base64 --decode &gt; app/release.keystore
+</code></pre>
+<p>2. Commit and Push your code.<br>2. Verify the build passes.<br></p>
+<h4 is-upgraded>Now we have release keystore file added on each build, we can use it and sign our application with Github Actions.</h4>
+<p>// TODO Nitzan - continue from here–&gt;</p>
 
 
       </google-codelab-step>

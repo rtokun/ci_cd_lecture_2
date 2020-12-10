@@ -77,7 +77,7 @@ Duration: 0:03:00
 ./gradlew testDebugUnitTest
 ```
 
-### Modify `.yaml` file
+### Modify `.yaml` file:
 
 <span>1.</span> Add to the bottom of your workfow file:<br/>
 
@@ -144,6 +144,45 @@ export MY_ENVIROMENT_VARIABLE = some_value
 <span>4.</span>  Now click on the "New Repository Secret" on the right top.<br/>
 <span>5.</span>  Add a new secret!<br/>
 ![image_caption](resources/New_secret.png)
+
+
+##Step 7 - Add keystore.release to Github secrets storage
+Duration: 0:03:00
+
+### 7.1 - Create release.keystore file if not exist yet (skip to step 7.2 if already have one)
+
+1. Go to ``Android Studio -> Build -> Generate Signed Bundle or APK``.
+2. Choose APK and click ``Next``.
+3. In the `Keystore Path` click `Create new...`.
+4. Follow wizard instructions, fill relevant data and remember created keystore location.
+
+### 7.2 - Generate base64 string from release.keystore file
+
+1. Open terminal in the folder where the keystore located at.
+2. Run `base64 -w 0 release.keystore | xclip -selection clipboard`(It will also copy the created string to your clipboard).
+
+### 7.3 - Add keystore string to Github secrets
+
+1. Go to your `Github repository -> Settings -> Secrets`.
+2. Create new secret and give it name `SIGNING_KEY`.
+3. Paste previously copied string as secret value and save the secret.
+
+##Step 8 - Create signed release APK
+Duration: 0:03:00
+
+### Modify `.yaml` file:
+
+<span>1.</span> Add these lines after `Grant rights` step:<br/>
+
+```yaml
+- name: Restore release keystore
+  run: echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > app/release.keystore
+```
+
+<span>2.</span> Commit and Push your code.<br/>
+<span>2.</span> Verify the build passes.<br/>
+
+##### Now we have release keystore file added on each build, we can use it and sign our application with Github Actions.
 
 
 // TODO Nitzan - continue from here-->
