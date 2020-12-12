@@ -14,11 +14,12 @@ Duration: 0:05:00
 3. Create a Github repository for this project(or skip to the step 4 if you already have one). You can follow the instructions [here](https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/create-a-repo).
 4. Optional step - Create first commit (we just want to verify your local copy is synced with Github repo and we can start work on CI/CD). From the app root folder, open terminal and run:
 
-```bash
-	git add .
-	git commit -m "Initial commit"
-	git push origin master
-``` 
+``` bash
+git add .
+git commit -m "Initial commit"
+git push origin master
+```
+
 
 #### Congrats! We can start with CI related files now :)
 
@@ -33,7 +34,7 @@ Duration: 0:05:00
 <span>3.</span> Create first configuration file `workflow_1.yaml`.<br/>
 <span>4.</span> Open it and add next code (make sure the indentation is exact as in the example, as yaml is sensitive to indentations):
 
-```yaml
+``` yaml
 name: "CI Workflow"
 on: [push]
 	
@@ -92,6 +93,7 @@ Duration: 0:03:00
 git commit -m "Add unit test to the workflow"
 git push origin master
 ```
+
 <span>3.</span> Verify your remote CI build triggers and passes.
 
 
@@ -102,15 +104,15 @@ Duration: 0:03:00
 
 ### Modify `workflow_1.yaml` file
 
-<span>1.</span> Change from:<br/>`./gradlew assembleDebug` to `./gradlew assembleRelease`<br/>
-<span>2.</span> Change from:<br/> `./gradlew testDebugUnitTest` to `./gradlew testReleaseUnitTest`<br/>
-<span>3.</span> Commit ang push the changes:
+1. Change from:<br/>`./gradlew assembleDebug` to `./gradlew assembleRelease`.
+2. Change from:<br/> `./gradlew testDebugUnitTest` to `./gradlew testReleaseUnitTest`.
+3. Commit ang push the changes:
 
 ``` bash
 git commit -m "Convert build to release"
 git push origin master
 ```
-<br/>
+
 
 #### Now we have a remote build, that creates release APK, but it is unsigned 😢. 
 
@@ -203,3 +205,78 @@ As we can not upload any files to Github secrets besides strings, we are going t
 <span>3.</span> Commit and push your code and verify build passes.
 
 #### Now we have a signed release.apk that we can distribute to our testers. Let's see how to do it ih the next step.
+
+## Distribute APK via Firebase Distribution
+
+### In order to distribute the app via Firebase Distribution we need several things:
+
+1. Create Firebase project for our application.
+2. Create Firebase Login token, which will be used for uploading the app to the Firebase.
+3. Create group of testers which will get the app updates each time it created.
+4. Use Firebase Github action for actually sending the release APK to the Firebase.
+
+#### 1. Create Firebase project for our app
+
+*Note: If you already integrated Firebase to the application and have valid Firebase project + app skip to the step 2*
+
+1. Go to Firebase console, login and click `Add project`.
+2. Follow the wizard instructions and at the end enter created project in the firebase console.
+3. In the project overview click `Add app`, select `Android` and follow the wizard.
+
+#### 2. Create Firebase Login token
+
+This token allows to 3rd party applications (in our case, this 3rd party is Github action, which responsible for uploading the app to the Firebase) get an access to the Firebase project and make operations.
+In order to get one we need to install the Firebase console client on our local computer, login via client to our Firebase account.
+
+&nbsp;&nbsp;1.</span> Open terminal and enter<br/>
+
+``` bash
+curl -sL https://firebase.tools | bash
+```
+
+&nbsp;&nbsp;<span>2.</span> After successful installation enter in terminal:<br/>
+
+``` bash
+firebase login:ci
+```
+
+It will open browser with Authentication page. Enter your credentials and after succesful authentication process go back to your terminal window, you should see there your token:
+
+``` bash
+✔  Success! Use this token to login on a CI server:
+
+1//03UkAUZpVhigPCgYIARAAGsotbjnrtl;ghkjnrts;lhkjntw;lhknrt;lhbknwrtl;khn;wlr0VcRQiYGtZSpo7DP1aS7X5OdCVJys
+```
+
+&nbsp;&nbsp;<span>3.</span> Copy the token, go to your Github repository and add this token as another secret variable with key `FIREBASE_TOKEN` and value the token itself.<br/>
+&nbsp;&nbsp;<span>4.</span> Now go to `Firebase project -> Settings -> General`, scroll down to your application settings and copy `App ID`.<br/>
+&nbsp;&nbsp;<span>5.</span> Go to your Github repository and add this id as secret with key `FIREBASE_APP_ID`.<br/>
+
+#### 3. Create group of testers
+
+1. Go to Firebase console -> In the memu select `Release and Monitor` category -> `App Distribution`.
+2. Click on `Testers and Groups` tab.
+3. Click `Add group`, give it a name `testers` and add at lease one email which will get the app updates.
+
+#### 4. Modify `workflow_1.yaml` file
+
+Add after `Generate APK` step next lines:
+
+``` yaml
+      - name: upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: testers
+          file: app/build/outputs/apk/release/app-release.apk
+```
+
+### Commit and push your changes. Now you have complete working CI/CD pipeline. To summarize what we have now:
+
+1. On each commit and push to the repository, new release build will be created.
+2. Tests will run.
+3. If all tests are passing the created APK will be uploaded to Firebase Distribution system. 
+4. All users in `testers` will be notified via email about new app update and will be able to install it.
+
+### Great success!

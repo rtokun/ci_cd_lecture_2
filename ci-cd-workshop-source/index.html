@@ -34,26 +34,19 @@
 <li>Create a Github repository for this project(or skip to the step 4 if you already have one). You can follow the instructions <a href="https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/create-a-repo" target="_blank">here</a>.</li>
 <li>Optional step - Create first commit (we just want to verify your local copy is synced with Github repo and we can start work on CI/CD). From the app root folder, open terminal and run:</li>
 </ol>
-<pre><code language="language-bash" class="language-bash">	git add .
-	git commit -m &#34;Initial commit&#34;
-	git push origin master
-``` 
+<pre><code language="language-bash" class="language-bash">git add .
+git commit -m &#34;Initial commit&#34;
+git push origin master
+</code></pre>
+<h3 is-upgraded>Congrats! We can start with CI related files now :)</h3>
 
-#### Congrats! We can start with CI related files now :)
 
-&lt;!-- ------------------------ --&gt;
-##  Run your first CI build
-Duration: 0:05:00
-
-### Add workflow file
-
-&lt;span&gt;1.&lt;/span&gt; Go to project and a directory `.github` in the root.&lt;br/&gt;
-&lt;span&gt;2.&lt;/span&gt; Inside it, create another directory called `workflows` (This is where all the GitHub Actions configuration files go).&lt;br/&gt;
-&lt;span&gt;3.&lt;/span&gt; Create first configuration file `workflow_1.yaml`.&lt;br/&gt;
-&lt;span&gt;4.&lt;/span&gt; Open it and add next code (make sure the indentation is exact as in the example, as yaml is sensitive to indentations):
-
-```yaml
-name: &#34;CI Workflow&#34;
+      </google-codelab-step>
+    
+      <google-codelab-step label="Run your first CI build" duration="5">
+        <h2 is-upgraded>Add workflow file</h2>
+<p>1. Go to project and a directory <code>.github</code> in the root.<br>2. Inside it, create another directory called <code>workflows</code> (This is where all the GitHub Actions configuration files go).<br>3. Create first configuration file <code>workflow_1.yaml</code>.<br>4. Open it and add next code (make sure the indentation is exact as in the example, as yaml is sensitive to indentations):</p>
+<pre><code language="language-yaml" class="language-yaml">name: &#34;CI Workflow&#34;
 on: [push]
 	
 jobs: 
@@ -101,7 +94,11 @@ git push origin master
     
       <google-codelab-step label="Convert to (unsigned) release build" duration="3">
         <h2 is-upgraded>Modify <code>workflow_1.yaml</code> file</h2>
-<p>1. Change from:<br><code>./gradlew assembleDebug</code> to <code>./gradlew assembleRelease</code><br>2. Change from:<br> <code>./gradlew testDebugUnitTest</code> to <code>./gradlew testReleaseUnitTest</code><br>3. Commit ang push the changes:</p>
+<ol type="1">
+<li>Change from:<br><code>./gradlew assembleDebug</code> to <code>./gradlew assembleRelease</code>.</li>
+<li>Change from:<br> <code>./gradlew testDebugUnitTest</code> to <code>./gradlew testReleaseUnitTest</code>.</li>
+<li>Commit ang push the changes:</li>
+</ol>
 <pre><code language="language-bash" class="language-bash">git commit -m &#34;Convert build to release&#34;
 git push origin master
 </code></pre>
@@ -174,6 +171,63 @@ git push origin master
 </code></pre>
 <p><br>3. Commit and push your code and verify build passes.</p>
 <h3 is-upgraded>Now we have a signed release.apk that we can distribute to our testers. Let&#39;s see how to do it ih the next step.</h3>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Distribute APK via Firebase Distribution" duration="0">
+        <h2 is-upgraded>In order to distribute the app via Firebase Distribution we need several things:</h2>
+<ol type="1">
+<li>Create Firebase project for our application.</li>
+<li>Create Firebase Login token, which will be used for uploading the app to the Firebase.</li>
+<li>Create group of testers which will get the app updates each time it created.</li>
+<li>Use Firebase Github action for actually sending the release APK to the Firebase.</li>
+</ol>
+<h3 is-upgraded>1. Create Firebase project for our app</h3>
+<p><em>Note: If you already integrated Firebase to the application and have valid Firebase project + app skip to the step 2</em></p>
+<ol type="1">
+<li>Go to Firebase console, login and click <code>Add project</code>.</li>
+<li>Follow the wizard instructions and at the end enter created project in the firebase console.</li>
+<li>In the project overview click <code>Add app</code>, select <code>Android</code> and follow the wizard.</li>
+</ol>
+<h3 is-upgraded>2. Create Firebase Login token</h3>
+<p>This token allows to 3rd party applications (in our case, this 3rd party is Github action, which responsible for uploading the app to the Firebase) get an access to the Firebase project and make operations. In order to get one we need to install the Firebase console client on our local computer, login via client to our Firebase account.</p>
+<p>  1. Open terminal and enter<br></p>
+<pre><code language="language-bash" class="language-bash">curl -sL https://firebase.tools | bash
+</code></pre>
+<p>  2. After successful installation enter in terminal:<br></p>
+<pre><code language="language-bash" class="language-bash">firebase login:ci
+</code></pre>
+<p>It will open browser with Authentication page. Enter your credentials and after succesful authentication process go back to your terminal window, you should see there your token:</p>
+<pre><code language="language-bash" class="language-bash">✔  Success! Use this token to login on a CI server:
+
+1//03UkAUZpVhigPCgYIARAAGsotbjnrtl;ghkjnrts;lhkjntw;lhknrt;lhbknwrtl;khn;wlr0VcRQiYGtZSpo7DP1aS7X5OdCVJys
+</code></pre>
+<p>  3. Copy the token, go to your Github repository and add this token as another secret variable with key <code>FIREBASE_TOKEN</code> and value the token itself.<br>   4. Now go to <code>Firebase project -> Settings -> General</code>, scroll down to your application settings and copy <code>App ID</code>.<br>   5. Go to your Github repository and add this id as secret with key <code>FIREBASE_APP_ID</code>.<br></p>
+<h3 is-upgraded>3. Create group of testers</h3>
+<ol type="1">
+<li>Go to Firebase console -&gt; In the memu select <code>Release and Monitor</code> category -&gt; <code>App Distribution</code>.</li>
+<li>Click on <code>Testers and Groups</code> tab.</li>
+<li>Click <code>Add group</code>, give it a name <code>testers</code> and add at lease one email which will get the app updates.</li>
+</ol>
+<h3 is-upgraded>4. Modify <code>workflow_1.yaml</code> file</h3>
+<p>Add after <code>Generate APK</code> step next lines:</p>
+<pre><code language="language-yaml" class="language-yaml">      - name: upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: $&#123;&#123;secrets.FIREBASE_APP_ID}}
+          token: $&#123;&#123;secrets.FIREBASE_TOKEN}}
+          groups: testers
+          file: app/build/outputs/apk/release/app-release.apk
+</code></pre>
+<h2 is-upgraded>Commit and push your changes. Now you have complete working CI/CD pipeline. To summarize what we have now:</h2>
+<ol type="1">
+<li>On each commit and push to the repository, new release build will be created.</li>
+<li>Tests will run.</li>
+<li>If all tests are passing the created APK will be uploaded to Firebase Distribution system.</li>
+<li>All users in <code>testers</code> will be notified via email about new app update and will be able to install it.</li>
+</ol>
+<h2 is-upgraded>Great success!</h2>
 
 
       </google-codelab-step>
