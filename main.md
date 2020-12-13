@@ -12,11 +12,14 @@ Duration: 0:05:00
 1. Create a new application in Android Studio (or use your own previously created one).
 2. Build and compile a project.
 3. Create a Github repository for this project(or skip to the step 4 if you already have one). You can follow the instructions [here](https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/create-a-repo).
-4. Optional step - Create first commit (we just want to verify your local copy is synced with Github repo and we can start work on CI/CD). From the app root folder, open terminal and run:
+4. Create first commit (we just want to verify your local copy is synced with Github repo and we can start work on CI/CD, if you have a Github repositore connected to the local project you can skip this step). From the app root folder, open terminal and run:
+
+*Note: pay attention to change a path to Github repository in the next script*
 
 ``` bash
 git add .
 git commit -m "Initial commit"
+git remote add origin <path to your repository i.e. git@github.com:rtokun/test-111.git>
 git push origin master
 ```
 
@@ -29,7 +32,7 @@ Duration: 0:05:00
 
 ### Add workflow file
 
-<span>1.</span> Go to project and a directory `.github` in the root.<br/>
+<span>1.</span> Go to project and create a directory `.github` in the root.<br/>
 <span>2.</span> Inside it, create another directory called `workflows` (This is where all the GitHub Actions configuration files go).<br/>
 <span>3.</span> Create first configuration file `workflow_1.yaml`.<br/>
 <span>4.</span> Open it and add next code (make sure the indentation is exact as in the example, as yaml is sensitive to indentations):
@@ -61,7 +64,8 @@ git commit -m "Initial CI script"
 git push origin master
 ```
 <br/>
-<span>6.</span> You should see a result:
+<span>6.</span> Go to your Github repository -> Actions tab.<br/>
+<span>7.</span> You should see your CI workflow running and after couple of minutes a result:
 ![image_caption](resources/initial-build-result.png)
 
 <!-- ------------------------ -->
@@ -90,12 +94,13 @@ Duration: 0:03:00
 <span>2.</span> Commit and push the changes:
 
 ``` bash
+git add .
 git commit -m "Add unit test to the workflow"
 git push origin master
 ```
 
-<span>3.</span> Verify your remote CI build triggers and passes.
-
+<span>3.</span> Verify your remote CI build triggers and passes:
+![image_caption](resources/tests-added-result.png)
 
 <!-- ------------------------ -->
 
@@ -104,15 +109,19 @@ Duration: 0:03:00
 
 ### Modify `workflow_1.yaml` file
 
-1. Change from:<br/>`./gradlew assembleDebug` to `./gradlew assembleRelease`.
-2. Change from:<br/> `./gradlew testDebugUnitTest` to `./gradlew testReleaseUnitTest`.
-3. Commit ang push the changes:
+&nbsp;&nbsp;<span>1.</span> Change from:<br/>`./gradlew assembleDebug` to `./gradlew assembleRelease`.
+<br/>&nbsp;&nbsp;<span>2.</span> Change from:<br/> `./gradlew testDebugUnitTest` to `./gradlew testReleaseUnitTest`.
+<br/>&nbsp;&nbsp;<span>3.</span> Commit ang push the changes:
 
 ``` bash
+git add .
 git commit -m "Convert build to release"
 git push origin master
 ```
 
+
+<br/>&nbsp;&nbsp;<span>4.</span> You should see your CI workflow running and after couple of minutes a result:
+![image_caption](resources/converted-to-release-result.png)
 
 #### Now we have a remote build, that creates release APK, but it is unsigned 😢. 
 
@@ -164,7 +173,7 @@ Add next lines inside `android` closure:
 ![image_caption](resources/Settings_Secrets_tab_github.png)
 
 <span>4.</span>  Now click on the "New Repository Secret" on the right top.<br/>
-<span>5.</span>  Give it a name `MY_APP_KEY_ALIAS` and a value you chosen before `your value` and click `Add secret`:<br/>
+<span>5.</span>  Give it a name `MY_APP_KEY_ALIAS` and a value you entered during keystore wizard and click `Add secret`:<br/>
 ![image_caption](resources/secrets_added.jpg)<br/>
 <span>6.</span>  Repeat steps 4-5 for the `MY_APP_STORE_PASSWORD` and `MY_APP_KEY_PASSWORD`.<br/>
 
@@ -175,7 +184,8 @@ As we can not upload any files to Github secrets besides strings, we are going t
 #### Generate base64 string from release.keystore file
 
 1. Open terminal in the folder where the keystore located at.
-2. Run `base64 -w 0 release.keystore | xclip -selection clipboard`(It will also copy the created string to your clipboard).
+2. Run `base64 <your keystore file name>`.
+3. Copy created string from terminal.
 
 #### Add keystore string to Github secrets (same as we did for the passwords and alias)
 
@@ -185,13 +195,13 @@ As we can not upload any files to Github secrets besides strings, we are going t
 
 #### Modify `workflow_1.yaml` file
 
-<span>1.</span> Add next lines after `Grant rights`:<br/>
+<span>1.</span> Add next lines after `Setup JDK 1.8` step:<br/>
 
 ``` yaml
 - name: Restore release keystore
-  run: echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > keystore.release
+  run: echo "${{ secrets.ENCODED_KEYSTORE }}" | base64 --decode > keystore.release
 ```
-<span>2.</span> Also modify current `Generate APK` step:
+<span>2.</span> Also replace current `Builds debug build` step with:
 
 ``` yaml
 - name: Generate APK
@@ -202,7 +212,8 @@ As we can not upload any files to Github secrets besides strings, we are going t
     MY_APP_KEY_ALIAS: ${{ secrets.MY_APP_KEY_ALIAS }}
 ```
 <br/>
-<span>3.</span> Commit and push your code and verify build passes.
+<span>3.</span> Commit and push your code and verify remote build passes:
+![image_caption](resources/signing-release-result.png)
 
 #### Now we have a signed release.apk that we can distribute to our testers. Let's see how to do it ih the next step.
 
@@ -219,9 +230,12 @@ As we can not upload any files to Github secrets besides strings, we are going t
 
 *Note: If you already integrated Firebase to the application and have valid Firebase project + app skip to the step 2*
 
-1. Go to Firebase console, login and click `Add project`.
-2. Follow the wizard instructions and at the end enter created project in the firebase console.
-3. In the project overview click `Add app`, select `Android` and follow the wizard.
+1. Go to [Firebase console](https://console.firebase.google.com/), login and click `Add project`.
+2. Follow the wizard instructions and complete project creation.
+3. In the project overview click `Add app`:
+![image_caption](resources/create-app-firebase.png)
+4. Select `Android` and follow the wizard. Complete the wizard including downloading `google-services.json` file, and modifying the gradle files.
+5. Make sure to compile and run the application on the emulator/device after a successful integration.
 
 #### 2. Create Firebase Login token
 
@@ -240,7 +254,7 @@ curl -sL https://firebase.tools | bash
 firebase login:ci
 ```
 
-It will open browser with Authentication page. Enter your credentials and after succesful authentication process go back to your terminal window, you should see there your token:
+It will open browser with Authentication page. Enter your credentials and after succesful authentication go back to your terminal window, you should see there your token:
 
 ``` bash
 ✔  Success! Use this token to login on a CI server:
@@ -255,12 +269,12 @@ It will open browser with Authentication page. Enter your credentials and after 
 #### 3. Create group of testers
 
 1. Go to Firebase console -> In the memu select `Release and Monitor` category -> `App Distribution`.
-2. Click on `Testers and Groups` tab.
-3. Click `Add group`, give it a name `testers` and add at lease one email which will get the app updates.
+2. Click on `Get started` -> `Testers and Groups` tab.
+3. Click `Add group`, give it a name `testers` and add at least one email which will get the app updates.
 
 #### 4. Modify `workflow_1.yaml` file
 
-Add after `Generate APK` step next lines:
+Add these lines at the very bottom:
 
 ``` yaml
       - name: upload artifact to Firebase App Distribution
@@ -272,7 +286,12 @@ Add after `Generate APK` step next lines:
           file: app/build/outputs/apk/release/app-release.apk
 ```
 
-### Commit and push your changes. Now you have complete working CI/CD pipeline. To summarize what we have now:
+### Commit and push your changes. Now you have complete working CI/CD pipeline, and all emails in the `testers` group we defined will get similar email after each successful build:
+
+![image_caption](resources/success-email-example.png)
+
+
+To summarize what we have now:
 
 1. On each commit and push to the repository, new release build will be created.
 2. Tests will run.
@@ -280,3 +299,7 @@ Add after `Generate APK` step next lines:
 4. All users in `testers` will be notified via email about new app update and will be able to install it.
 
 ### Great success!
+
+![image_caption](resources/great-success.gif)
+
+
