@@ -149,7 +149,7 @@ git push origin master
 <h3 is-upgraded>Generate base64 string from release.keystore file</h3>
 <ol type="1">
 <li>Open terminal in the folder where the keystore located at.</li>
-<li>Run <code>base64 <your keystore file name></code>.</li>
+<li>Run <code>base64 < your keystore file name ></code>.</li>
 <li>Copy created string from terminal.</li>
 </ol>
 <h3 is-upgraded>Add keystore string to Github secrets (same as we did for the passwords and alias)</h3>
@@ -210,7 +210,7 @@ git push origin master
 <p>  3. Copy the token, go to your Github repository and add this token as another secret variable with key <code>FIREBASE_TOKEN</code> and value the token itself.<br>   4. Now go to <code>Firebase project -> Settings -> General</code>, scroll down to your application settings and copy <code>App ID</code>.<br>   5. Go to your Github repository and add this id as secret with key <code>FIREBASE_APP_ID</code>.<br></p>
 <h3 is-upgraded>3. Create group of testers</h3>
 <ol type="1">
-<li>Go to Firebase console -&gt; In the memu select <code>Release and Monitor</code> category -&gt; <code>App Distribution</code>.</li>
+<li>Go to Firebase console -&gt; In the left menu find <code>App Distribution</code>.</li>
 <li>Click on <code>Get started</code> -&gt; <code>Testers and Groups</code> tab.</li>
 <li>Click <code>Add group</code>, give it a name <code>testers</code> and add at least one email which will get the app updates.</li>
 </ol>

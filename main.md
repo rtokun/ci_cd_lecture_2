@@ -184,7 +184,7 @@ As we can not upload any files to Github secrets besides strings, we are going t
 #### Generate base64 string from release.keystore file
 
 1. Open terminal in the folder where the keystore located at.
-2. Run `base64 <your keystore file name>`.
+2. Run `base64 < your keystore file name >`.
 3. Copy created string from terminal.
 
 #### Add keystore string to Github secrets (same as we did for the passwords and alias)
@@ -268,7 +268,7 @@ It will open browser with Authentication page. Enter your credentials and after 
 
 #### 3. Create group of testers
 
-1. Go to Firebase console -> In the memu select `Release and Monitor` category -> `App Distribution`.
+1. Go to Firebase console -> In the left menu find `App Distribution`.
 2. Click on `Get started` -> `Testers and Groups` tab.
 3. Click `Add group`, give it a name `testers` and add at least one email which will get the app updates.
 
@@ -295,8 +295,8 @@ To summarize what we have now:
 
 1. On each commit and push to the repository, new release build will be created.
 2. Tests will run.
-3. If all tests are passing the created APK will be uploaded to Firebase Distribution system. 
-4. All users in `testers` will be notified via email about new app update and will be able to install it.
+3. If all steps in the pipeline (including tests) are passing the created APK will be uploaded to Firebase Distribution system. 
+4. All users in `testers` group will be notified via email about new app update and will be able to install it.
 
 ### Great success!
 
