@@ -206,7 +206,7 @@ git push origin master
 <pre><code language="language-yaml" class="language-yaml">- name: Restore release keystore
   run: echo &#34;$&#123;&#123; secrets.ENCODED_KEYSTORE }}&#34; | base64 --decode &gt; app/keystore.release
 </code></pre>
-<p>2. Also replace current <code>Builds debug build</code> step with:</p>
+<p>2. Also replace current <code>Builds release build</code> step with:</p>
 <pre><code language="language-yaml" class="language-yaml">- name: Generate APK
   run: ./gradlew assembleRelease
   env:

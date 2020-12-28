@@ -251,7 +251,7 @@ As we can not upload any files to Github secrets besides strings, we are going t
 - name: Restore release keystore
   run: echo "${{ secrets.ENCODED_KEYSTORE }}" | base64 --decode > app/keystore.release
 ```
-<span>2.</span> Also replace current `Builds debug build` step with:
+<span>2.</span> Also replace current `Builds release build` step with:
 
 ``` yaml
 - name: Generate APK
