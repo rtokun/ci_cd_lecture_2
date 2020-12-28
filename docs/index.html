@@ -27,20 +27,14 @@
                   environment="web"
                   feedback-link="">
     
-      <google-codelab-step label="Repository Setup" duration="5">
-        <ol type="1">
-<li>Create a new application in Android Studio (or use your own previously created one).</li>
-<li>Build and compile a project.</li>
-<li>Create a Github repository for this project(or skip to the step 4 if you already have one). You can follow the instructions <a href="https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/create-a-repo" target="_blank">here</a>.</li>
-<li>Create first commit (we just want to verify your local copy is synced with Github repo and we can start work on CI/CD, if you have a Github repositore connected to the local project you can skip this step). From the app root folder, open terminal and run:</li>
+      <google-codelab-step label="Environment Preparations" duration="10">
+        <p>As a prerequisite for this codelab, you have to set up several environmental preparations. Please follow the instructions <a href="https://rtokun.github.io/ci-cd-workshop-prerequisites-site/#0" target="_blank">here</a>. These preparations will include:</p>
+<ol type="1">
+<li>Creation of a new starter application in Android Studio.</li>
+<li>Creation Github repo and connecting it to the application (important step is verifying the ability not just pulling a code from a remote, but also pushing it to remote).</li>
+<li>Creation Firebase project and connecting it to the Android application.</li>
 </ol>
-<p><em>Note: pay attention to change a path to Github repository in the next script</em></p>
-<pre><code language="language-bash" class="language-bash">git add .
-git commit -m &#34;Initial commit&#34;
-git remote add origin &lt;path to your repository i.e. git@github.com:rtokun/test-111.git&gt;
-git push origin master
-</code></pre>
-<h3 is-upgraded>Congrats! We can start with CI related files now :)</h3>
+<h2 is-upgraded>These steps are crucial to the next steps, so please verify their completion.</h2>
 
 
       </google-codelab-step>
@@ -58,10 +52,12 @@ jobs:
     steps: 
       - name: &#34;Checkout current repository in ubuntu&#39;s file system&#34;
         uses: actions/checkout@v1
+        
       - name: &#34;Setup JDK 1.8&#34;
         uses: actions/setup-java@v1
         with: 
           java-version: 1.8
+          
       - name: &#34;Builds debug build&#34;
         run: ./gradlew assembleDebug
 </code></pre>
@@ -85,6 +81,29 @@ git push origin master
 <pre><code language="language-yaml" class="language-yaml">- name: Unit tests
   run: ./gradlew testDebugUnitTest
 </code></pre>
+<p>Your complete <code>workflow_1.yaml</code> should look like this now:</p>
+<pre><code language="language-YAML" class="language-YAML">name: &#34;CI Workflow&#34;
+on: [push]
+
+jobs:
+  build:
+    name: &#34;Build project&#34;
+    runs-on: ubuntu-latest
+    steps:
+      - name: &#34;Checkout current repository in ubuntu&#39;s file system&#34;
+        uses: actions/checkout@v1
+
+      - name: &#34;Setup JDK 1.8&#34;
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+          
+      - name: &#34;Builds debug build&#34;
+        run: ./gradlew assembleDebug
+
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest
+</code></pre>
 <p>2. Commit and push the changes:</p>
 <pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Add unit test to the workflow&#34;
@@ -97,7 +116,31 @@ git push origin master
     
       <google-codelab-step label="Convert to (unsigned) release build" duration="3">
         <h2 is-upgraded>Modify <code>workflow_1.yaml</code> file</h2>
-<p>  1. Change from:<br><code>./gradlew assembleDebug</code> to <code>./gradlew assembleRelease</code>. <br>  2. Change from:<br> <code>./gradlew testDebugUnitTest</code> to <code>./gradlew testReleaseUnitTest</code>. <br>  3. Commit ang push the changes:</p>
+<p>  1. Change from:<br><code>./gradlew assembleDebug</code> to <code>./gradlew assembleRelease</code>. <br>  2. Change from:<br> <code>./gradlew testDebugUnitTest</code> to <code>./gradlew testReleaseUnitTest</code>.</p>
+<p>Your complete <code>workflow_1.yaml</code> should look like this now:</p>
+<pre><code language="language-YAML" class="language-YAML">name: &#34;CI Workflow&#34;
+on: [push]
+
+jobs:
+  build:
+    name: &#34;Build project&#34;
+    runs-on: ubuntu-latest
+    steps:
+      - name: &#34;Checkout current repository in ubuntu&#39;s file system&#34;
+        uses: actions/checkout@v1
+
+      - name: &#34;Setup JDK 1.8&#34;
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+          
+      - name: &#34;Builds release build&#34;
+        run: ./gradlew assembleRelease
+
+      - name: Unit tests
+        run: ./gradlew testReleaseUnitTest
+</code></pre>
+<p><br>  3. Commit ang push the changes:</p>
 <pre><code language="language-bash" class="language-bash">git add .
 git commit -m &#34;Convert build to release&#34;
 git push origin master
@@ -114,8 +157,8 @@ git push origin master
 <li>Go to <code>Android Studio -> Build -> Generate Signed Bundle or APK</code>.</li>
 <li>Choose APK and click <code>Next</code>.</li>
 <li>In the <code>Keystore Path</code> click <code>Create new...</code>.</li>
-<li>Follow wizard instructions, fill relevant data and remember created keystore location.</li>
-<li>Continue the wizard and build release.apk, just to verify that we are able to build a release version of the app locally.</li>
+<li>Follow wizard instructions, fill in relevant data, and remember the created Keystore location.</li>
+<li>Continue the wizard and build release.apk, just to verify that we can build a release version of the app locally.</li>
 </ol>
 <h2 is-upgraded>Modify your app/build.gradle</h2>
 <p>Add next lines inside <code>android</code> closure:</p>
@@ -148,20 +191,20 @@ git push origin master
 <p>As we can not upload any files to Github secrets besides strings, we are going to convert our release.keystore to base64 string, store it and during the build process we will convert it back to file.</p>
 <h3 is-upgraded>Generate base64 string from release.keystore file</h3>
 <ol type="1">
-<li>Open terminal in the folder where the keystore located at.</li>
-<li>Run <code>base64 < your keystore file name ></code>.</li>
-<li>Copy created string from terminal.</li>
+<li>Open the terminal in the folder where the Keystore is located at.</li>
+<li>Run <code>base64 < your Keystore file name ></code>.</li>
+<li>Copy the created string from the terminal.</li>
 </ol>
 <h3 is-upgraded>Add keystore string to Github secrets (same as we did for the passwords and alias)</h3>
 <ol type="1">
 <li>Go to your <code>Github repository -> Settings -> Secrets</code>.</li>
-<li>Create new secret and give it name <code>ENCODED_KEYSTORE</code>.</li>
-<li>Paste previously copied string as secret value and save the secret.</li>
+<li>Create a new secret and give it the name <code>ENCODED_KEYSTORE</code>.</li>
+<li>Paste the previously copied string as a secret value and save the secret.</li>
 </ol>
 <h3 is-upgraded>Modify <code>workflow_1.yaml</code> file</h3>
 <p>1. Add next lines after <code>Setup JDK 1.8</code> step:<br></p>
 <pre><code language="language-yaml" class="language-yaml">- name: Restore release keystore
-  run: echo &#34;$&#123;&#123; secrets.ENCODED_KEYSTORE }}&#34; | base64 --decode &gt; keystore.release
+  run: echo &#34;$&#123;&#123; secrets.ENCODED_KEYSTORE }}&#34; | base64 --decode &gt; app/keystore.release
 </code></pre>
 <p>2. Also replace current <code>Builds debug build</code> step with:</p>
 <pre><code language="language-yaml" class="language-yaml">- name: Generate APK
@@ -171,52 +214,82 @@ git push origin master
     MY_APP_KEY_PASSWORD: $&#123;&#123; secrets.MY_APP_KEY_PASSWORD }}
     MY_APP_KEY_ALIAS: $&#123;&#123; secrets.MY_APP_KEY_ALIAS }}
 </code></pre>
+<p>Your complete <code>workflow_1.yaml</code> should look like this now:</p>
+<pre><code language="language-YAML" class="language-YAML">name: &#34;CI Workflow&#34;
+on: [push]
+
+jobs:
+  build:
+    name: &#34;Build project&#34;
+    runs-on: ubuntu-latest
+    steps:
+      - name: &#34;Checkout current repository in ubuntu&#39;s file system&#34;
+        uses: actions/checkout@v1
+
+      - name: &#34;Setup JDK 1.8&#34;
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Restore release keystore
+        run: echo &#34;$&#123;&#123; secrets.ENCODED_KEYSTORE }}&#34; | base64 --decode &gt; app/keystore.release
+
+      - name: Unit tests
+        run: ./gradlew testReleaseUnitTest
+
+      - name: Generate APK
+        run: ./gradlew assembleRelease
+        env:
+          MY_APP_STORE_PASSWORD: $&#123;&#123; secrets.MY_APP_STORE_PASSWORD }}
+          MY_APP_KEY_PASSWORD: $&#123;&#123; secrets.MY_APP_KEY_PASSWORD }}
+          MY_APP_KEY_ALIAS: $&#123;&#123; secrets.MY_APP_KEY_ALIAS }}
+</code></pre>
 <p><br>3. Commit and push your code and verify remote build passes: <img alt="image_caption" src="img/63e7711151957659.png"></p>
-<h3 is-upgraded>Now we have a signed release.apk that we can distribute to our testers. Let&#39;s see how to do it ih the next step.</h3>
+<h3 is-upgraded>Now we have a signed release.apk that we can distribute to our testers. Let&#39;s see how to do it in the next step.</h3>
 
 
       </google-codelab-step>
     
       <google-codelab-step label="Distribute APK via Firebase Distribution" duration="0">
-        <h2 is-upgraded>In order to distribute the app via Firebase Distribution we need several things:</h2>
+        <h2 is-upgraded>To distribute the app via Firebase Distribution we need several things:</h2>
 <ol type="1">
-<li>Create Firebase project for our application.</li>
-<li>Create Firebase Login token, which will be used for uploading the app to the Firebase.</li>
-<li>Create group of testers which will get the app updates each time it created.</li>
+<li>Create a Firebase project for our application.</li>
+<li>Create a Firebase Login token, which will be used for uploading the app to the Firebase.</li>
+<li>Create a group of testers that will get the app updates each time it is created.</li>
 <li>Use Firebase Github action for actually sending the release APK to the Firebase.</li>
 </ol>
-<h3 is-upgraded>1. Create Firebase project for our app</h3>
-<p><em>Note: If you already integrated Firebase to the application and have valid Firebase project + app skip to the step 2</em></p>
+<h3 is-upgraded>1. Create a Firebase project for our app</h3>
+<p><em>Note: If you already integrated Firebase to the application and have valid Firebase project + app skip to step 2</em></p>
 <ol type="1">
-<li>Go to <a href="https://console.firebase.google.com/" target="_blank">Firebase console</a>, login and click <code>Add project</code>.</li>
+<li>Go to <a href="https://console.firebase.google.com/" target="_blank">Firebase console</a>, login, and click <code>Add project</code>.</li>
 <li>Follow the wizard instructions and complete project creation.</li>
 <li>In the project overview click <code>Add app</code>: <img alt="image_caption" src="img/9c0ab324412ce5ae.png"></li>
-<li>Select <code>Android</code> and follow the wizard. Complete the wizard including downloading <code>google-services.json</code> file, and modifying the gradle files.</li>
-<li>Make sure to compile and run the application on the emulator/device after a successful integration.</li>
+<li>Select <code>Android</code> and follow the wizard. Complete the wizard including downloading <code>google-services.json</code> file, and modifying the Gradle files.</li>
+<li>Make sure to compile and run the application on the emulator/device after successful integration.</li>
 </ol>
 <h3 is-upgraded>2. Create Firebase Login token</h3>
-<p>This token allows to 3rd party applications (in our case, this 3rd party is Github action, which responsible for uploading the app to the Firebase) get an access to the Firebase project and make operations. In order to get one we need to install the Firebase console client on our local computer, login via client to our Firebase account.</p>
+<p>This token allows to 3rd party applications (in our case, this 3rd party is Github action, which responsible for uploading the app to the Firebase) get access to the Firebase project and make operations. To get one we need to install the Firebase console client on our local computer, log in via client to our Firebase account.</p>
 <p>  1. Open terminal and enter<br></p>
 <pre><code language="language-bash" class="language-bash">curl -sL https://firebase.tools | bash
 </code></pre>
 <p>  2. After successful installation enter in terminal:<br></p>
 <pre><code language="language-bash" class="language-bash">firebase login:ci
 </code></pre>
-<p>It will open browser with Authentication page. Enter your credentials and after succesful authentication go back to your terminal window, you should see there your token:</p>
-<pre><code language="language-bash" class="language-bash">✔  Success! Use this token to login on a CI server:
+<p>It will open the browser with the Authentication page. Enter your credentials and after successful authentication go back to your terminal window, you should see there your token:</p>
+<pre><code language="language-bash" class="language-bash">✔  Success! Use this token to log in on a CI server:
 
 1//03UkAUZpVhigPCgYIARAAGsotbjnrtl;ghkjnrts;lhkjntw;lhknrt;lhbknwrtl;khn;wlr0VcRQiYGtZSpo7DP1aS7X5OdCVJys
 </code></pre>
 <p>  3. Copy the token, go to your Github repository and add this token as another secret variable with key <code>FIREBASE_TOKEN</code> and value the token itself.<br>   4. Now go to <code>Firebase project -> Settings -> General</code>, scroll down to your application settings and copy <code>App ID</code>.<br>   5. Go to your Github repository and add this id as secret with key <code>FIREBASE_APP_ID</code>.<br></p>
-<h3 is-upgraded>3. Create group of testers</h3>
+<h3 is-upgraded>3. Create a group of testers</h3>
 <ol type="1">
 <li>Go to Firebase console -&gt; In the left menu find <code>App Distribution</code>.</li>
 <li>Click on <code>Get started</code> -&gt; <code>Testers and Groups</code> tab.</li>
-<li>Click <code>Add group</code>, give it a name <code>testers</code> and add at least one email which will get the app updates.</li>
+<li>Click <code>Add group</code>, give it the name <code>testers</code> and add at least one email which will get the app updates.</li>
 </ol>
 <h3 is-upgraded>4. Modify <code>workflow_1.yaml</code> file</h3>
 <p>Add these lines at the very bottom:</p>
-<pre><code language="language-yaml" class="language-yaml">      - name: upload artifact to Firebase App Distribution
+<pre><code language="language-YAML" class="language-YAML">      - name: upload artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: $&#123;&#123;secrets.FIREBASE_APP_ID}}
@@ -224,14 +297,52 @@ git push origin master
           groups: testers
           file: app/build/outputs/apk/release/app-release.apk
 </code></pre>
-<h2 is-upgraded>Commit and push your changes. Now you have complete working CI/CD pipeline, and all emails in the <code>testers</code> group we defined will get similar email after each successful build:</h2>
+<p>Your complete <code>workflow_1.yaml</code> should look like this now:</p>
+<pre><code language="language-YAML" class="language-YAML">name: &#34;CI Workflow&#34;
+on: [push]
+
+jobs:
+  build:
+    name: &#34;Build project&#34;
+    runs-on: ubuntu-latest
+    steps:
+      - name: &#34;Checkout current repository in ubuntu&#39;s file system&#34;
+        uses: actions/checkout@v1
+
+      - name: &#34;Setup JDK 1.8&#34;
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Restore release keystore
+        run: echo &#34;$&#123;&#123; secrets.ENCODED_KEYSTORE }}&#34; | base64 --decode &gt; app/keystore.release
+
+      - name: Unit tests
+        run: ./gradlew testReleaseUnitTest
+
+      - name: Generate APK
+        run: ./gradlew assembleRelease
+        env:
+          MY_APP_STORE_PASSWORD: $&#123;&#123; secrets.MY_APP_STORE_PASSWORD }}
+          MY_APP_KEY_PASSWORD: $&#123;&#123; secrets.MY_APP_KEY_PASSWORD }}
+          MY_APP_KEY_ALIAS: $&#123;&#123; secrets.MY_APP_KEY_ALIAS }}
+
+      - name: upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: $&#123;&#123;secrets.FIREBASE_APP_ID}}
+          token: $&#123;&#123;secrets.FIREBASE_TOKEN}}
+          groups: testers
+          file: app/build/outputs/apk/release/app-release.apk
+</code></pre>
+<h2 is-upgraded>Commit and push your changes. Now you have a complete working CI/CD pipeline, and all emails in the <code>testers</code> group we defined will get a similar email after each successful build:</h2>
 <p class="image-container"><img alt="image_caption" src="img/d99b0bb237e391fd.png"></p>
 <p>To summarize what we have now:</p>
 <ol type="1">
-<li>On each commit and push to the repository, new release build will be created.</li>
+<li>On each commit and push to the repository, a new release build will be created.</li>
 <li>Tests will run.</li>
-<li>If all tests are passing the created APK will be uploaded to Firebase Distribution system.</li>
-<li>All users in <code>testers</code> will be notified via email about new app update and will be able to install it.</li>
+<li>If all steps in the pipeline (including tests) are passing the created APK will be uploaded to the Firebase Distribution system.</li>
+<li>All users in <code>testers</code> group will be notified via email about the new app update and will be able to install it.</li>
 </ol>
 <h2 is-upgraded>Great success!</h2>
 <p class="image-container"><img alt="image_caption" src="img/ad1947159abfa503.gif"></p>
