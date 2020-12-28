@@ -304,60 +304,21 @@ jobs:
 
 ## Distribute APK via Firebase Distribution
 
-### To distribute the app via Firebase Distribution we need several things:
+### Important: In the prerequisites of this codelab, you requested to setup Firebase account and acquire the firebase token. If you didn't do it, please do it now, the instructions can be found [here](https://rtokun.github.io/ci-cd-workshop-prerequisites-site/#1)
 
-1. Create a Firebase project for our application.
-2. Create a Firebase Login token, which will be used for uploading the app to the Firebase.
-3. Create a group of testers that will get the app updates each time it is created.
-4. Use Firebase Github action for actually sending the release APK to the Firebase.
+#### 1. Set Firebase Login token in Github secrets
 
-#### 1. Create a Firebase project for our app
-
-*Note: If you already integrated Firebase to the application and have valid Firebase project + app skip to step 2*
-
-1. Go to [Firebase console](https://console.firebase.google.com/), login, and click `Add project`.
-2. Follow the wizard instructions and complete project creation.
-3. In the project overview click `Add app`:
-![image_caption](resources/create-app-firebase.png)
-4. Select `Android` and follow the wizard. Complete the wizard including downloading `google-services.json` file, and modifying the Gradle files.
-5. Make sure to compile and run the application on the emulator/device after successful integration.
-
-#### 2. Create Firebase Login token
-
-This token allows to 3rd party applications (in our case, this 3rd party is Github action, which responsible for uploading the app to the Firebase) get access to the Firebase project and make operations.
-To get one we need to install the Firebase console client on our local computer, log in via client to our Firebase account.
-
-&nbsp;&nbsp;1.</span> Open terminal and enter<br/>
-
-``` bash
-curl -sL https://firebase.tools | bash
-```
-
-&nbsp;&nbsp;<span>2.</span> After successful installation enter in terminal:<br/>
-
-``` bash
-firebase login:ci
-```
-
-It will open the browser with the Authentication page. Enter your credentials and after successful authentication go back to your terminal window, you should see there your token:
-
-``` bash
-✔  Success! Use this token to log in on a CI server:
-
-1//03UkAUZpVhigPCgYIARAAGsotbjnrtl;ghkjnrts;lhkjntw;lhknrt;lhbknwrtl;khn;wlr0VcRQiYGtZSpo7DP1aS7X5OdCVJys
-```
-
-&nbsp;&nbsp;<span>3.</span> Copy the token, go to your Github repository and add this token as another secret variable with key `FIREBASE_TOKEN` and value the token itself.<br/>
+&nbsp;&nbsp;<span>1.</span> Copy previously acquired firebase token, go to your Github repository and add this token as another secret variable with key `FIREBASE_TOKEN` and value the token itself.<br/>
 &nbsp;&nbsp;<span>4.</span> Now go to `Firebase project -> Settings -> General`, scroll down to your application settings and copy `App ID`.<br/>
 &nbsp;&nbsp;<span>5.</span> Go to your Github repository and add this id as secret with key `FIREBASE_APP_ID`.<br/>
 
-#### 3. Create a group of testers
+#### 2. Create a group of testers
 
 1. Go to Firebase console -> In the left menu find `App Distribution`.
 2. Click on `Get started` -> `Testers and Groups` tab.
 3. Click `Add group`, give it the name `testers` and add at least one email which will get the app updates.
 
-#### 4. Modify `workflow_1.yaml` file
+#### 3. Modify `workflow_1.yaml` file
 
 Add these lines at the very bottom:
 
