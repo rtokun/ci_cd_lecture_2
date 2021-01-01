@@ -310,6 +310,15 @@ jobs:
 
 &nbsp;&nbsp;<span>1.</span> Copy previously acquired firebase token, go to your Github repository and add this token as another secret variable with key `FIREBASE_TOKEN` and value the token itself.<br/>
 &nbsp;&nbsp;<span>4.</span> Now go to `Firebase project -> Settings -> General`, scroll down to your application settings and copy `App ID`.<br/>
+
+![image_caption](resources/firebase home.png)
+
+![image_caption](resources/firebase settings.png)
+
+![image_caption](resources/firebase general.png)
+
+![image_caption](resources/firebase App id.png)
+
 &nbsp;&nbsp;<span>5.</span> Go to your Github repository and add this id as secret with key `FIREBASE_APP_ID`.<br/>
 
 #### 2. Create a group of testers
