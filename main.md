@@ -62,6 +62,8 @@ git push origin master
 <span>7.</span> You should see your CI workflow running and after couple of minutes a result:
 ![image_caption](resources/initial-build-result.png)
 
+### *######## Wait for the lecture to continue. ########*
+
 <!-- ------------------------ -->
 
 ## Add Unit Tests
@@ -175,6 +177,8 @@ git push origin master
 
 #### Now we have a remote build, that creates release APK, but it is unsigned 😢. 
 
+### *######## Wait for the lecture to continue. ########*
+
 <!-- ------------------------ -->
 
 ## Signing your release
@@ -231,11 +235,18 @@ Add next lines inside `android` closure:
 
 As we can not upload any files to Github secrets besides strings, we are going to convert our release.keystore to base64 string, store it and during the build process we will convert it back to file.
 
-#### Generate base64 string from release.keystore file
+#### Generate base64 string from release.keystore file (Mac users)
 
 1. Open the terminal in the folder where the Keystore is located at.
 2. Run `base64 < your Keystore file name >`.
 3. Copy the created string from the terminal.
+
+
+#### Generate base64 string from release.keystore file (Windows users)
+
+1. Go to this [website](https://base64.guru/converter/encode/file).
+2. Upload your `release.keystore` file to there and click `Encode file to Base64 string`.
+3. Copy the created string from the output window.
 
 #### Add keystore string to Github secrets (same as we did for the passwords and alias)
 
@@ -301,6 +312,8 @@ jobs:
 ![image_caption](resources/signing-release-result.png)
 
 #### Now we have a signed release.apk that we can distribute to our testers. Let's see how to do it in the next step.
+
+### *######## Wait for the lecture to continue. ########*
 
 ## Distribute APK via Firebase Distribution
 

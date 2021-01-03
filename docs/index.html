@@ -67,6 +67,7 @@ git commit -m &#34;Initial CI script&#34;
 git push origin master
 </code></pre>
 <p><br>6. Go to your Github repository -&gt; Actions tab.<br>7. You should see your CI workflow running and after couple of minutes a result: <img alt="image_caption" src="img/b9af7217e73b5557.png"></p>
+<h2 is-upgraded><em>######## Wait for the lecture to continue. ########</em></h2>
 
 
       </google-codelab-step>
@@ -147,6 +148,7 @@ git push origin master
 </code></pre>
 <p><br>  4. You should see your CI workflow running and after couple of minutes a result: <img alt="image_caption" src="img/3678bc99a0d15058.png"></p>
 <h3 is-upgraded>Now we have a remote build, that creates release APK, but it is unsigned 😢.</h3>
+<h2 is-upgraded><em>######## Wait for the lecture to continue. ########</em></h2>
 
 
       </google-codelab-step>
@@ -189,11 +191,17 @@ git push origin master
 <p>4.  Now click on the &#34;New Repository Secret&#34; on the right top.<br>5.  Give it a name <code>MY_APP_KEY_ALIAS</code> and a value you entered during keystore wizard and click <code>Add secret</code>:<br><img alt="image_caption" src="img/dd9427641cfc012e.jpg"><br>6.  Repeat steps 4-5 for the <code>MY_APP_STORE_PASSWORD</code> and <code>MY_APP_KEY_PASSWORD</code>.<br></p>
 <h2 is-upgraded>Upload release.keystore to Github secrets</h2>
 <p>As we can not upload any files to Github secrets besides strings, we are going to convert our release.keystore to base64 string, store it and during the build process we will convert it back to file.</p>
-<h3 is-upgraded>Generate base64 string from release.keystore file</h3>
+<h3 is-upgraded>Generate base64 string from release.keystore file (Mac users)</h3>
 <ol type="1">
 <li>Open the terminal in the folder where the Keystore is located at.</li>
 <li>Run <code>base64 < your Keystore file name ></code>.</li>
 <li>Copy the created string from the terminal.</li>
+</ol>
+<h3 is-upgraded>Generate base64 string from release.keystore file (Windows users)</h3>
+<ol type="1">
+<li>Go to this <a href="https://base64.guru/converter/encode/file" target="_blank">website</a>.</li>
+<li>Upload your <code>release.keystore</code> file to there and click <code>Encode file to Base64 string</code>.</li>
+<li>Copy the created string from the output window.</li>
 </ol>
 <h3 is-upgraded>Add keystore string to Github secrets (same as we did for the passwords and alias)</h3>
 <ol type="1">
@@ -246,6 +254,7 @@ jobs:
 </code></pre>
 <p><br>3. Commit and push your code and verify remote build passes: <img alt="image_caption" src="img/63e7711151957659.png"></p>
 <h3 is-upgraded>Now we have a signed release.apk that we can distribute to our testers. Let&#39;s see how to do it in the next step.</h3>
+<h2 is-upgraded><em>######## Wait for the lecture to continue. ########</em></h2>
 
 
       </google-codelab-step>
@@ -253,7 +262,12 @@ jobs:
       <google-codelab-step label="Distribute APK via Firebase Distribution" duration="0">
         <h2 is-upgraded>Important: In the prerequisites of this codelab, you requested to setup Firebase account and acquire the firebase token. If you didn&#39;t do it, please do it now, the instructions can be found <a href="https://rtokun.github.io/ci-cd-workshop-prerequisites-site/#1" target="_blank">here</a></h2>
 <h3 is-upgraded>1. Set Firebase Login token in Github secrets</h3>
-<p>  1. Copy previously acquired firebase token, go to your Github repository and add this token as another secret variable with key <code>FIREBASE_TOKEN</code> and value the token itself.<br>   4. Now go to <code>Firebase project -> Settings -> General</code>, scroll down to your application settings and copy <code>App ID</code>.<br>   5. Go to your Github repository and add this id as secret with key <code>FIREBASE_APP_ID</code>.<br></p>
+<p>  1. Copy previously acquired firebase token, go to your Github repository and add this token as another secret variable with key <code>FIREBASE_TOKEN</code> and value the token itself.<br>   4. Now go to <code>Firebase project -> Settings -> General</code>, scroll down to your application settings and copy <code>App ID</code>.<br></p>
+<p class="image-container"><img alt="image_caption" src="img/8f1cefd784c7ef60.png"></p>
+<p class="image-container"><img alt="image_caption" src="img/efe6f0b2e52e69de.png"></p>
+<p class="image-container"><img alt="image_caption" src="img/b55b97d634a2183a.png"></p>
+<p class="image-container"><img alt="image_caption" src="img/d54355939ccb4bd7.png"></p>
+<p>  5. Go to your Github repository and add this id as secret with key <code>FIREBASE_APP_ID</code>.<br></p>
 <h3 is-upgraded>2. Create a group of testers</h3>
 <ol type="1">
 <li>Go to Firebase console -&gt; In the left menu find <code>App Distribution</code>.</li>
