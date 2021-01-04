@@ -46,6 +46,9 @@ jobs:
         with: 
           java-version: 1.8
           
+      - name: "Give Permissions"
+        run: chmod +x gradlew
+          
       - name: "Builds debug build"
         run: ./gradlew assembleDebug
 ```
@@ -106,6 +109,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+                
+      - name: "Give Permissions"
+        run: chmod +x gradlew
           
       - name: "Builds debug build"
         run: ./gradlew assembleDebug
@@ -155,6 +161,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+                
+      - name: "Give Permissions"
+        run: chmod +x gradlew
           
       - name: "Builds release build"
         run: ./gradlew assembleRelease
@@ -292,6 +301,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+          
+      - name: "Give Permissions"
+        run: chmod +x gradlew
 
       - name: Restore release keystore
         run: echo "${{ secrets.ENCODED_KEYSTORE }}" | base64 --decode > app/keystore.release
@@ -373,6 +385,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+          
+      - name: "Give Permissions"
+        run: chmod +x gradlew
 
       - name: Restore release keystore
         run: echo "${{ secrets.ENCODED_KEYSTORE }}" | base64 --decode > app/keystore.release
